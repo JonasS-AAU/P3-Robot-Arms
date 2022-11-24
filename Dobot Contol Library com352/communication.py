@@ -52,8 +52,6 @@ class Communication:
         for i in range(len(params)):
             payload = payload + params[i]
 
-
-
         x = payload % 256
         checksum = (256-x) % 256
         return checksum
