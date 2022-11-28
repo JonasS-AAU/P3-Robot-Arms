@@ -38,7 +38,7 @@ class Commmunication:
 
         return command
 
-
+'''
 coms = Commmunication
 ser = coms.setup_serial(coms,'COM4')
 
@@ -50,7 +50,7 @@ def set_conveyor_speed(speed):
     command = coms.build_command(coms,payload,length,checksum)
     return command
 
-def home():
+def home(): 
     payload = coms.pack_payload(coms, '=BBi', 31, 3, 0)
     length = coms.calculate_length(coms,'=BBi')
     checksum = coms.calculate_checksum(coms,list(payload))
@@ -79,7 +79,7 @@ def get_pose():
     return command
 
 def read_pose():
-    #msg = struct.unpack('=BBBBBfffff',pose)
+
     wrapraw =ser.read(5)
     wrapper = struct.unpack('=BBBBB',wrapraw)
     print(wrapper)
@@ -89,7 +89,6 @@ def read_pose():
     (x,y,z,r,ja) = pose
     return x,y,z
     
-
 
 command = get_pose()
 #command = move_arm(0,0,50)
@@ -106,7 +105,7 @@ ser.write(command2)
 
 #REMEMBER TO MAKE RELATIVE NOT ABSOLUTE BY PUTTING GET POSE INTO MOVE ARM COMMAND
 
-
+'''
 
     
 
