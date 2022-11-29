@@ -1,4 +1,4 @@
-from communication_v2 import Commmunication as coms
+from communication import Commmunication as coms
 import serial as ser
 import struct
 
@@ -86,6 +86,10 @@ class Commands:
         #rotation and joint angle not currently in use
         (x,y,z,r,j_angle) = pose
         return x,y,z
+
+    def move_relaive(self,delta_x,delta_y,delta_z):
+        (x,y,z) = self.read_pose
+        self.move_arm(x+delta_x,y+delta_y,z+delta_z)
         
 
 
