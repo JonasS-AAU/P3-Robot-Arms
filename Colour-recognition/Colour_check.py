@@ -40,10 +40,8 @@ class clr_rec:
             while i <= j-1:
                 if (X[i] - X[i-1]) > 50:
                     t = i
-                    print("works")
                     while j > 0:
                         X2.append(X[t])
-                        #print(X[t])
                         X = np.delete(X,t)
                         Y2.append(Y[t])
                         Y = np.delete(Y,t)
@@ -56,7 +54,6 @@ class clr_rec:
 
         elif ((max(Y)-min(Y)) > (max(X) - min(X))):
             Y, X = self.sort_index(self, Y,X)
-            print("runs")
             X2 = []
             Y2 = []
             j = len(X)
@@ -64,15 +61,14 @@ class clr_rec:
             while i <= j-1:
                 if (Y[i] - Y[i-1]) > 50:
                     t = i
-                    print("works")
                     while j > 0:
                         X2.append(X[t])
-                        #print(X[t])
                         X = np.delete(X,t)
                         Y2.append(Y[t])
                         Y = np.delete(Y,t)
                         j = len(X) - t
                 i  = i + 1
+            print(len(X))
             if len(X2) > 0:
                 return (min(Y)+((max(Y)-min(Y))/2),min(X)+((max(X)-min(X))/2)), (min(Y2)+((max(Y2)-min(Y2))/2),min(X2)+((max(X2)-min(X2))/2))
             else:  
@@ -83,8 +79,7 @@ rec = clr_rec
 upper = np.array([50, 56, 200])
 lower = np.array([17, 15, 100])
 
-X, Y = rec.find_clr(rec,"Control.jpg", upper, lower)
+X, Y = rec.find_clr(rec,"Test6.jpg", upper, lower)
 
 a,b = rec.find_coordinates(rec, X,Y)
 print(a,b)
-rec.find_clr()
