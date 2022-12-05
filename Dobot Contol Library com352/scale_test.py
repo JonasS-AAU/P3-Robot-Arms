@@ -4,11 +4,8 @@ from camera import Camera as cam
 
 cmds = commands.Commands("PORT")
 
-cmds.home()
+cmds.move_arm(cmds.home_coord[0],cmds.home_coord[1],cmds.home_coord[2])
+img = cam.capture_image()
 
-img1 = cam.capture_image()
-cam.save_image(img1,"first_img")
-cmds.move_relaive(20,0,0)
-img2 = cam.capture_image()
-cam.save_image(img2,"last_img")
+cam.save_image(img,'')
 
