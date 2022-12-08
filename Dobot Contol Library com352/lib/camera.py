@@ -8,7 +8,7 @@ class Camera:
     def __init__(self):
         pass
 
-    def capture_image():
+    def capture_image(self):
         camera = PiCamera()
         rawCapture = PiRGBArray(camera)
         time.sleep(0.1)      
@@ -16,6 +16,6 @@ class Camera:
         image = rawCapture.array
         return image
 
-    def save_image(image,filename):
+    def save_image(self,image,filename):
         cv2.imwrite(filename,image)
 

@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 
 class clr_rec:
-    def __init__(self):
+    def __init__(self, boundary):
+        self.boundary = boundary
         pass
 
     def sort_index(self, A, B):
@@ -27,12 +28,11 @@ class clr_rec:
         '''
         # Load image
         image = cv2.imread(img)
-        print(image)
         Y, X = np.where(np.all((image<=upper) & (image>=lower), axis = 2))
         print(X,Y)
         return Y, X
 
-    def find_outlier(self,img,Boundary, color_index):
+    def find_outlier(self,img, color_index):
         '''
         Finds BGR values in image for all pixels, returns X and Y as lists with coordinates of colored cubes found.
 
@@ -40,10 +40,10 @@ class clr_rec:
         :params Boundary: The BGR lower and upper boundary for the color found, must be a list of tuples of BGR values [B,G,R] with max of 255 each and min of 1 each.
         :params color_index: The list index of the color that should not be scanned.
         '''
-        del Boundary[color_index]
+        del self.boundary[color_index]
         X = np.zeros(0,dtype=int)
         Y = np.zeros(0,dtype=int)
-        for (lower, upper) in Boundary:
+        for (lower, upper) in self.boundary:
             image = cv2.imread(img)
             tmpY, tmpX = np.where(np.all((image<=upper) & (image>=lower), axis = 2))
             X = np.concatenate((X,tmpX),axis=None)
@@ -116,7 +116,7 @@ class clr_rec:
             if len(X2) == 0:
                 search = False
         return center
-"""
+
 Distance = {"Very small" : 5, "Small" : 50, "Medium" : 100, "Large" : 150}
 
 boundaries = [
@@ -126,10 +126,10 @@ boundaries = [
 ]
 upper = np.array([220, 88, 50])
 lower = np.array([86, 31, 4])
-
+'''
 rec = clr_rec()
 #X,Y = rec.find_clr("Test9.jpg", upper, lower)
 X,Y = rec.find_outlier("Test10.jpg",boundaries,1)
 cord = rec.find_coordinates(X,Y,Distance["Very small"])
 print(cord)
-"""
+'''
