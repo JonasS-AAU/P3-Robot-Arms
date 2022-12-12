@@ -6,13 +6,12 @@ import cv2
 
 class Camera:
     def __init__(self):
-        pass
+        self.camera = PiCamera()
 
     def capture_image(self):
-        camera = PiCamera()
-        rawCapture = PiRGBArray(camera)
+        rawCapture = PiRGBArray(self.camera)
         time.sleep(0.1)      
-        camera.capture(rawCapture,format='bgr')
+        self.camera.capture(rawCapture,format='bgr')
         image = rawCapture.array
         return image
 
