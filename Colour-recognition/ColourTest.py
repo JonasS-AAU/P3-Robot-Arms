@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 
 class clr_rec:
-    def __init__(self):
-        pass
+    def __init__(self, boundaries):
+        self.boundaries = boundaries
 
     def sort_index(self, A, B):
         tmp = np.zeros_like(A)
@@ -31,7 +31,7 @@ class clr_rec:
         center = self.find_coordinates(Y,X,dist)
         return center
 
-    def find_outlier(self, img, color_index, boundary, dist):
+    def find_outlier(self, img, color_index, dist):
         '''
         Finds BGR values in image for all pixels, returns X and Y as lists with coordinates of colored cubes found.
 
@@ -39,17 +39,16 @@ class clr_rec:
         :params Boundary: The BGR lower and upper boundary for the color found, must be a list of tuples of BGR values [B,G,R] with max of 255 each and min of 1 each.
         :params color_index: The list index of the color that should not be scanned.
         '''
-        #print(self.boundaries)
-        #boundary = self.boundaries
-        center = []
-        tmp = boundary[:]
-        del tmp[color_index]
+        boundary = self.boundaries
+        del boundary[color_index]
         X = np.zeros(0,dtype=int)
         Y = np.zeros(0,dtype=int)
-        for (lower, upper) in tmp:
+        for (lower, upper) in boundary:
             image = cv2.imread(img)
-            Y, X = np.where(np.all((image<=upper) & (image>=lower), axis = 2))
-            center.extend(self.find_coordinates(Y,X,dist))
+            tmpY, tmpX = np.where(np.all((image<=upper) & (image>=lower), axis = 2))
+            X = np.concatenate((X,tmpX),axis=None)
+            Y = np.concatenate((Y,tmpY),axis=None)
+        center = self.find_coordinates(Y,X,dist)
         return center
 
 
@@ -106,7 +105,11 @@ boundaries = [
 	([86, 31, 4], [220, 88, 50]),
 	([25, 146, 190], [62, 174, 250])
 ]
-
-
 upper = np.array([220, 88, 50])
 lower = np.array([86, 31, 4])
+
+rec = clr_rec(boundaries)
+#X,Y = rec.find_clr("Test9.jpg", upper, lower)
+cord = rec.find_outlier("Colour-recognition/Test7.jpg",1,Distance["Very small"])
+
+print(cord)
