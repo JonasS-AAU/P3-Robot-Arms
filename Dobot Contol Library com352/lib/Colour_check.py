@@ -17,7 +17,7 @@ class clr_rec:
                 B[i] = tmp[index[i]]
         return A, B
 
-    def find_clr(self, img, upper, lower):
+    def find_clr(self, img, upper, lower, dist):
         '''
         Finds BGR values in image for all pixels
 
@@ -27,12 +27,11 @@ class clr_rec:
         '''
         # Load image
         image = cv2.imread(img)
-        print(image)
         Y, X = np.where(np.all((image<=upper) & (image>=lower), axis = 2))
-        print(X,Y)
-        return Y, X
+        center = self.find_coordinates(Y,X,dist)
+        return center
 
-    def find_outlier(self,img,Boundary, color_index):
+    def find_outlier(self, img, color_index, boundary, dist):
         '''
         Finds BGR values in image for all pixels, returns X and Y as lists with coordinates of colored cubes found.
 
@@ -40,25 +39,30 @@ class clr_rec:
         :params Boundary: The BGR lower and upper boundary for the color found, must be a list of tuples of BGR values [B,G,R] with max of 255 each and min of 1 each.
         :params color_index: The list index of the color that should not be scanned.
         '''
-        del Boundary[color_index]
+        #print(self.boundaries)
+        #boundary = self.boundaries
+        center = []
+        tmp = boundary[:]
+        del tmp[color_index]
         X = np.zeros(0,dtype=int)
         Y = np.zeros(0,dtype=int)
-        for (lower, upper) in Boundary:
+        for (lower, upper) in tmp:
             image = cv2.imread(img)
-            tmpY, tmpX = np.where(np.all((image<=upper) & (image>=lower), axis = 2))
-            X = np.concatenate((X,tmpX),axis=None)
-            Y = np.concatenate((Y,tmpY),axis=None)
-        return Y,X
+            Y, X = np.where(np.all((image<=upper) & (image>=lower), axis = 2))
+            print(len(Y))
+            try:
+                center.extend(self.find_coordinates(Y,X,dist))
+            except:
+                pass
+        center = sorted(center,reverse=False)
+        return center
 
 
     def find_coordinates(self, X, Y,dist):
-        tmpX = []
-        tmpY = []
         search = True
         center = []
         while search == True:
             if (max(Y)-min(Y)) <= (max(X) - min(X)):
-                print("X longer")
                 X, Y = self.sort_index(X,Y)
                 X2 = []
                 Y2 = []
@@ -76,7 +80,6 @@ class clr_rec:
                     i  = i + 1
 
             elif ((max(Y)-min(Y)) > (max(X) - min(X))):
-                print("Y longer")
                 Y, X = self.sort_index(Y,X)
                 X2 = []
                 Y2 = []
@@ -94,29 +97,13 @@ class clr_rec:
                     i  = i + 1
             
             center.append([min(Y)+((max(Y)-min(Y))/2),min(X)+((max(X)-min(X))/2)])
-            print(center)
-            '''
-            print(max(X),min(X2))
-            print(max(Y),min(Y2))
-            print(len(X),len(Y))
-            print(len(X2),len(Y2))
-            
-
-            if len(tmpX) == 0:
-                tmpX = X
-                tmpY = Y
-            if len(tmpX) > len(X2)+1000:
-                X = tmpX
-                Y = tmpY
-            else:
-            '''
             X = X2
             Y = Y2
             
             if len(X2) == 0:
                 search = False
         return center
-"""
+
 Distance = {"Very small" : 5, "Small" : 50, "Medium" : 100, "Large" : 150}
 
 boundaries = [
@@ -124,12 +111,7 @@ boundaries = [
 	([86, 31, 4], [220, 88, 50]),
 	([25, 146, 190], [62, 174, 250])
 ]
+
+
 upper = np.array([220, 88, 50])
 lower = np.array([86, 31, 4])
-
-rec = clr_rec()
-#X,Y = rec.find_clr("Test9.jpg", upper, lower)
-X,Y = rec.find_outlier("Test10.jpg",boundaries,1)
-cord = rec.find_coordinates(X,Y,Distance["Very small"])
-print(cord)
-"""
