@@ -118,6 +118,24 @@ class Commands:
             if (index[0] % 2 == 0):
                 print('done waiting')
                 break
+    def death(self):
+        '''
+        dies robot
+        '''
+        payload = coms.pack_payload(coms,'=BBB',242,1,0)
+        length = coms.calculate_length(coms, '=BBB')
+        checksum = coms.calculate_checksum(coms, list(payload))
+        command = coms.build_command(coms,payload,length,checksum)
+        coms.send_command(coms,self.serial_port,command)
 
 
-    
+    def res(self):
+        '''
+        res robot
+        '''
+        payload = coms.pack_payload(coms,'=BBB',240,1,0)
+        length = coms.calculate_length(coms, '=BBB')
+        checksum = coms.calculate_checksum(coms, list(payload))
+        command = coms.build_command(coms,payload,length,checksum)
+        coms.send_command(coms,self.serial_port,command)
+

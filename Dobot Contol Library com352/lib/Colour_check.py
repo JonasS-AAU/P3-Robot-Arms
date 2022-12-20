@@ -2,8 +2,9 @@ import cv2
 import numpy as np
 
 class clr_rec:
-    def __init__(self):
-        pass
+    def __init__(self,center_arm):
+        self.center_arm = center_arm
+        self.start_px = 0
 
     def sort_index(self, A, B):
         tmp = np.zeros_like(A)
@@ -17,6 +18,17 @@ class clr_rec:
                 B[i] = tmp[index[i]]
         return A, B
 
+    def find_start_px(self,img,img_len):
+        '''
+        
+        '''
+        image = cv2.imread(img)
+        Y, X = np.where(np.all((image <= (255,255,255)) & (image >= (240,240,240)), axis = 2))
+        white_px = np.where(Y < img_len/2, Y, Y*0)
+        self.start_px = max(white_px)
+        print(self.start_px)
+        return self.start_px
+
     def find_clr(self, img, upper, lower, dist):
         '''
         Finds BGR values in image for all pixels
@@ -25,10 +37,20 @@ class clr_rec:
         :params upper: The BGR upper boundary for the color found, must be tuple of BGR values [B,G,R] with max of 255 each.
         :params lower: The BGR lower boundary for the color found, must be a tuple of BGR values [B, G, R] with min of 1 each.
         '''
+        correct = False
         # Load image
         image = cv2.imread(img)
         Y, X = np.where(np.all((image<=upper) & (image>=lower), axis = 2))
         center = self.find_coordinates(Y,X,dist)
+        
+        while correct == False:
+            correct = True
+            if center[0][1]<self.start_px:
+                center.pop(0)
+                correct = False
+            if center[0][0]<self.center_arm:
+                center.pop(0)
+                correct = False
         return center
 
     def find_outlier(self, img, color_index, boundary, dist):
@@ -41,6 +63,7 @@ class clr_rec:
         '''
         #print(self.boundaries)
         #boundary = self.boundaries
+        correct = False
         center = []
         tmp = boundary[:]
         del tmp[color_index]
@@ -49,14 +72,22 @@ class clr_rec:
         for (lower, upper) in tmp:
             image = cv2.imread(img)
             Y, X = np.where(np.all((image<=upper) & (image>=lower), axis = 2))
-            print(len(Y))
             try:
                 center.extend(self.find_coordinates(Y,X,dist))
             except:
                 pass
         center = sorted(center,reverse=False)
+        
+        while correct == False:
+            correct = True
+            if center[0][1]<self.start_px:
+                center.pop(0)
+                correct = False
+            if center[0][0]<self.center_arm-30:
+                center.pop(0)
+                correct = False
         return center
-
+    
 
     def find_coordinates(self, X, Y,dist):
         search = True
@@ -73,9 +104,9 @@ class clr_rec:
                         t = i
                         while j > 0:
                             X2.append(X[t])
-                            X = np.delete(X,t)
                             Y2.append(Y[t])
                             Y = np.delete(Y,t)
+                            X = np.delete(X,t)
                             j = len(X) - t
                     i  = i + 1
 
@@ -90,9 +121,9 @@ class clr_rec:
                         t = i
                         while j > 0:
                             X2.append(X[t])
-                            X = np.delete(X,t)
                             Y2.append(Y[t])
                             Y = np.delete(Y,t)
+                            X = np.delete(X,t)
                             j = len(X) - t
                     i  = i + 1
             
@@ -102,6 +133,7 @@ class clr_rec:
             
             if len(X2) == 0:
                 search = False
+        
         return center
 
 Distance = {"Very small" : 5, "Small" : 50, "Medium" : 100, "Large" : 150}

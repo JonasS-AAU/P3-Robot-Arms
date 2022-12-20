@@ -17,6 +17,11 @@ class clr_rec:
                 B[i] = tmp[index[i]]
         return A, B
 
+    def find_start_px(self,img):
+        image = cv2.imread(img)
+        Y, _ = np.where(np.all((image <= (255,255,255)) & (image >= (240,240,240)), axis = 2))
+        self.start_px = max(Y)
+
     def find_clr(self, img, upper, lower, dist):
         '''
         Finds BGR values in image for all pixels
@@ -39,8 +44,6 @@ class clr_rec:
         :params Boundary: The BGR lower and upper boundary for the color found, must be a list of tuples of BGR values [B,G,R] with max of 255 each and min of 1 each.
         :params color_index: The list index of the color that should not be scanned.
         '''
-        #print(self.boundaries)
-        #boundary = self.boundaries
         center = []
         tmp = boundary[:]
         del tmp[color_index]
@@ -49,10 +52,12 @@ class clr_rec:
         for (lower, upper) in tmp:
             image = cv2.imread(img)
             Y, X = np.where(np.all((image<=upper) & (image>=lower), axis = 2))
-            center.extend(self.find_coordinates(Y,X,dist))
-        center = sorted(center, reverse=True)
+            try:
+                center.extend(self.find_coordinates(Y,X,dist))
+            except:
+                pass
         return center
-
+    
 
     def find_coordinates(self, X, Y,dist):
         search = True
@@ -69,9 +74,9 @@ class clr_rec:
                         t = i
                         while j > 0:
                             X2.append(X[t])
-                            X = np.delete(X,t)
                             Y2.append(Y[t])
                             Y = np.delete(Y,t)
+                            X = np.delete(X,t)
                             j = len(X) - t
                     i  = i + 1
 
@@ -86,9 +91,9 @@ class clr_rec:
                         t = i
                         while j > 0:
                             X2.append(X[t])
-                            X = np.delete(X,t)
                             Y2.append(Y[t])
                             Y = np.delete(Y,t)
+                            X = np.delete(X,t)
                             j = len(X) - t
                     i  = i + 1
             
