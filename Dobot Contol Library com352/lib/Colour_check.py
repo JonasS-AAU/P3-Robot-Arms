@@ -67,6 +67,7 @@ class clr_rec:
         #Runs find_coordinates function to find center pixels
         center = self.find_coordinates(Y,X,dist)
         
+        #Removes first value if it is not present on the conveyor belt, or too far for the conveyor to get
         while correct == False:
             correct = True
             if center[0][1]<self.start_px:
@@ -77,6 +78,7 @@ class clr_rec:
                 correct = False
         return center
 
+    #Finds centre of all other colors than the one set to ignore
     def find_outlier(self, img, color_index, boundary, dist):
         '''
         Finds BGR values in image for all pixels, returns X and Y as lists with coordinates of colored cubes found.
@@ -85,23 +87,27 @@ class clr_rec:
         :params Boundary: The BGR lower and upper boundary for the color found, must be a list of tuples of BGR values [B,G,R] with max of 255 each and min of 1 each.
         :params color_index: The list index of the color that should not be scanned.
         '''
-        #print(self.boundaries)
-        #boundary = self.boundaries
         correct = False
         center = []
         tmp = boundary[:]
+        #Removes color boundary that is set to be ignored
         del tmp[color_index]
-        X = np.zeros(0,dtype=int)
-        Y = np.zeros(0,dtype=int)
+        #Goes for each color in the list
         for (lower, upper) in tmp:
+            #reads image
             image = cv2.imread(img)
+            #Finds pixels within color boundary
             Y, X = np.where(np.all((image<=upper) & (image>=lower), axis = 2))
+            #If there are any cubes present, find centers and add them to list, else go to next color
             try:
                 center.extend(self.find_coordinates(Y,X,dist))
             except:
                 pass
+        
+        #When all center found, sort them from lowest to highest x-value
         center = sorted(center,reverse=False)
         
+        #Removes first value if it is not present on the conveyor belt, or too far for the conveyor to get
         while correct == False:
             correct = True
             if center[0][1]<self.start_px:
@@ -112,20 +118,25 @@ class clr_rec:
                 correct = False
         return center
     
-
+    #Finds coordinates of centre from array of color coordinates
     def find_coordinates(self, X, Y,dist):
         search = True
         center = []
+        #While searching for cubes
         while search == True:
+            #Checks if X range is larger than Y range, or they are equal
             if (max(Y)-min(Y)) <= (max(X) - min(X)):
+                #Sorts arrays with X array as main array
                 X, Y = self.sort_index(X,Y)
                 X2 = []
                 Y2 = []
                 j = len(X)
                 i = 1   
+                #Checks until large enough distance between two pixels are found to be labeled as different cubes
                 while i <= j-1:
                     if (X[i] - X[i-1]) > dist:
                         t = i
+                        #Splits array so one cube stays in first array, and all others, if any, are sent to second array
                         while j > 0:
                             X2.append(X[t])
                             Y2.append(Y[t])
@@ -133,16 +144,19 @@ class clr_rec:
                             X = np.delete(X,t)
                             j = len(X) - t
                     i  = i + 1
-
+            #Checks if Y range is greater than X range
             elif ((max(Y)-min(Y)) > (max(X) - min(X))):
+                #Sorts arrays with Y array as main array
                 Y, X = self.sort_index(Y,X)
                 X2 = []
                 Y2 = []
                 j = len(X)
                 i = 1   
+                #Checks until large enough distance between two pixels are found to be labeled as different cubes
                 while i <= j-1:
                     if (Y[i] - Y[i-1]) > dist:
                         t = i
+                        #Splits array so one cube stays in first array, and all others, if any, are sent to second array
                         while j > 0:
                             X2.append(X[t])
                             Y2.append(Y[t])
@@ -150,24 +164,29 @@ class clr_rec:
                             X = np.delete(X,t)
                             j = len(X) - t
                     i  = i + 1
-            
+            #Finds center of cube in first array and appends it to list
             center.append([min(Y)+((max(Y)-min(Y))/2),min(X)+((max(X)-min(X))/2)])
+
+            #Sets first array values to second array
             X = X2
             Y = Y2
             
+            #If any other cubes present, stop while loop
             if len(X2) == 0:
                 search = False
-        
+        #Return list of centers
         return center
 
+#Example values for distances
 Distance = {"Very small" : 5, "Small" : 50, "Medium" : 100, "Large" : 150}
 
+#Boundary colors
 boundaries = [
-	([17, 15, 100], [50, 56, 200]),
-	([86, 31, 4], [220, 88, 50]),
-	([25, 146, 190], [62, 174, 250])
+	([17, 15, 100], [50, 56, 200]),     #Red
+	([86, 31, 4], [220, 88, 50]),       #Blue
+	([25, 146, 190], [62, 174, 250])    #Yellow
 ]
 
-
+#Blue boundary
 upper = np.array([220, 88, 50])
 lower = np.array([86, 31, 4])
