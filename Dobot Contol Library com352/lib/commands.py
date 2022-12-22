@@ -91,10 +91,21 @@ class Commands:
         return x,y,z
 
     def move_relaive(self,delta_x,delta_y,delta_z):
+        '''
+        Moves the arm relative to the current position
+        :param delta_x: change in x axis
+        :param delta_y: change in y axis
+        :param delta_z: change in z axis
+        '''
+        
+        
         (x,y,z) = self.read_pose()
         self.move_arm(x+delta_x,y+delta_y,z+delta_z)
 
     def get_queue_index(self):
+        '''
+        Returns queue index of currently queued command
+        '''
         self.serial_port.flush()
         payload = coms.pack_payload(coms,'=BB',246,0)
         length = coms.calculate_length(coms,'=BB')
@@ -120,7 +131,7 @@ class Commands:
                 break
     def death(self):
         '''
-        dies robot
+        immediatly stops the robot from executing commands
         '''
         payload = coms.pack_payload(coms,'=BBB',242,1,0)
         length = coms.calculate_length(coms, '=BBB')
@@ -131,7 +142,7 @@ class Commands:
 
     def res(self):
         '''
-        res robot
+        resumes exectuion of commands called before death()
         '''
         payload = coms.pack_payload(coms,'=BBB',240,1,0)
         length = coms.calculate_length(coms, '=BBB')
