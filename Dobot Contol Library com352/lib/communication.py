@@ -8,7 +8,7 @@ class Commmunication:
 
     def setup_serial(self,port):
         """
-        This function sets up a serial connection over USB with the given paramenters.
+        ets up a serial connection over USB with the given paramenters.
         
         :param port: USB the serial connection should be established over
         """
@@ -23,7 +23,7 @@ class Commmunication:
 
     def pack_payload(self, format,*args):
         """
-        This functions uses struct.pack to convert a format string and a list of parameters into a byte_string
+        uses struct.pack to convert a format string and a list of parameters into a byte_string
         
         :param format: the format of the paramters to be packed, syntax can be found in struct documentation
         :param *args: list of parameters to be packed
@@ -33,7 +33,7 @@ class Commmunication:
 
     def calculate_length(self,format):
         """
-        This function finds the length of the payload
+        finds the length of the payload
         
         :param format: the format of the payload, syntax can be found in struct documentation
         """
@@ -42,7 +42,7 @@ class Commmunication:
 
     def calculate_checksum(self,*payload):
         """
-        This function finds the checksum of a payload parmater list
+        finds the checksum of a payload parmater list
         
         :param *payload: list of payload paramters
         """
@@ -52,7 +52,7 @@ class Commmunication:
 
     def build_command(self,packaged_payload,length,checksum):
         """
-        This function packs the final byste-string for the command to be sent
+        packs the final byste-string for the command to be sent
         
         :param packaged_payload: the packaged packload that is returned by pack_payload()
         :param length: the length of the payload returned by calculate_length()
@@ -69,7 +69,7 @@ class Commmunication:
 
     def send_command(self,ser,command):
         """
-        This function sends a command through the serial connection created by setup_serial()
+        sends a command through the serial connection created by setup_serial()
         
         :param commmand: the byte-string of a command retuned by build_command()
         """
